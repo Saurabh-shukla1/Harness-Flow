@@ -1,0 +1,1 @@
+export const systemPrompt = await Bun.file(`${import.meta.dir}/agent-system-prompt.md`).text();
