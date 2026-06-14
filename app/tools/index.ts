@@ -1,3 +1,17 @@
+import { initMcp } from "./mcp/mcp";
+
+export const mcp = await initMcp();
+const mcpTools = mcp.tools;
+export const callMcpTool = mcp.callTool;
+export const mcpToolsNames = mcp.toolNames;
+
+//Merge MCP tools with custom tools
+const formatedTools = mcpTools.map(t => ({
+  name: t.name,
+  description: t.description,
+  inputSchema: t.inputSchema,
+}))
+
 export const tools = [
   {
     type: "function" as const,
@@ -203,5 +217,15 @@ Correct workflow for interacting with a form:
         required: ["action", "directory"],
       },
     }
-  }
+  },
+  ...formatedTools.map(t => ({
+    type: "function" as const,
+    function: {
+      name: t.name,
+      description: t.description,
+      parameters: t.inputSchema,
+    },
+  }))
 ];
+
+

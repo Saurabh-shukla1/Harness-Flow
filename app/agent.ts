@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 import { execSync } from "child_process";
-import { tools } from "./tools";
+import { callMcpTool, mcpToolsNames, tools } from "./tools";
 import { selectModel, type ModelFlag } from "./model";
 import webSerch from "./tools/web";
 import { getCurrentDatetime } from "./tools/currentDatetime";
@@ -173,6 +173,26 @@ async function runAgentLoop(
               tool_call_id: toolCall.id,
               content: `Error performing git action: ${error.message || "Unknown error"}`,
             });
+          }
+        } else if (mcpToolsNames.has(functionName)) {
+          try {
+            const result = await callMcpTool(functionName, args);
+
+            const blocks = Array.isArray(result.content) ? result.content : []
+
+            const content = blocks.map((block) => block.type === "text" ? block.text : JSON.stringify(block),).join("\n") ?? JSON.stringify(result.content);
+            messages.push({
+              role: "tool",
+              tool_call_id: toolCall.id,
+              content: content,
+            });
+          } catch (error: any) {
+            messages.push({
+              role: "tool",
+              tool_call_id: toolCall.id,
+              content: `Error calling MCP tool: ${error.message || "Unknown error"}`,
+            });
+
           }
         }
         else {

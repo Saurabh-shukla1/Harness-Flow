@@ -125,7 +125,7 @@ export function createContentArea(
     const block = turns[index];
     if (!block) {
       onDone?.();
-      return { finish: () => {}, cancel: () => {} };
+      return { finish: () => { }, cancel: () => { } };
     }
 
     block.setResponse("");
